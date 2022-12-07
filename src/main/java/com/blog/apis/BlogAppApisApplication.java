@@ -1,18 +1,26 @@
 package com.blog.apis;
 
+import java.util.List;
+
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.blog.apis.config.AppConstants;
+import com.blog.apis.entities.Role;
+import com.blog.apis.repositories.RoleRepo;
+
+import lombok.extern.slf4j.Slf4j;
 
 @SpringBootApplication
+@Slf4j
 public class BlogAppApisApplication implements CommandLineRunner {
 	
 	@Autowired
-	private PasswordEncoder passwordEncoder;
+	private RoleRepo roleRepo;
 
 	public static void main(String[] args) {
 		SpringApplication.run(BlogAppApisApplication.class, args);
@@ -25,7 +33,23 @@ public class BlogAppApisApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-		System.out.println(this.passwordEncoder.encode("abc123"));
 		
+		try {
+			Role role1 = new Role();
+			role1.setRoleId(AppConstants.ADMIN_USER);
+			role1.setName("ROLE_ADMIN");	
+			
+			Role role2 = new Role();
+			role2.setRoleId(AppConstants.NORMAL_USER);
+			role2.setName("ROLE_USER");
+			
+			List<Role> roles = List.of(role1, role2);
+			List<Role> results = roleRepo.saveAll(roles);
+			
+			results.forEach(role -> log.info(role.toString()));
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
 	}
 }
